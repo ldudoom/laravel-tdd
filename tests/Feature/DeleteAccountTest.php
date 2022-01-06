@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class DeleteAccountTest extends TestCase
 {
-    use RefreshDatabase;
+    /*use RefreshDatabase;
 
     public function test_user_accounts_can_be_deleted()
     {
@@ -42,5 +42,5 @@ class DeleteAccountTest extends TestCase
                         ->assertHasErrors(['password']);
 
         $this->assertNotNull($user->fresh());
-    }
+    }*/
 }
