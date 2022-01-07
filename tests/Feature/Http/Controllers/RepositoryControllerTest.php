@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\User;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+
+use App\Models\User;
+use App\Models\Repository;
 
 class RepositoryControllerTest extends TestCase
 {
@@ -33,7 +36,7 @@ class RepositoryControllerTest extends TestCase
             - Enviemos al metodo store
             - Y esto persista en la BBDD
     */
-    public function test_store(){
+    public function test_store_repository(){
         // En primer lugar vamos a generar los datos que se van a enviar a guardar, es decir simulamos el formulario
         // de creacion de resgistros
         $aData = [
@@ -54,6 +57,90 @@ class RepositoryControllerTest extends TestCase
 
         // Ahora verificamos que estos datos se encuentren registrados en la base de datos en la tabla repositories.
         $this->assertDatabaseHas('repositories', $aData);
+
+    }
+
+
+    /*
+        En este test vamos a probar que el guardado de la actualizacionun registro en la base de datos este correcto
+        Para eso tendremos que validar que:
+            - Se cargue correctamente un formulario populado
+            - Si queremos, actualizamos alguna informaicon
+            - Enviemos al metodo update
+            - Y estos cambios persistan en la BBDD
+    */
+    public function test_update_repository(){
+
+        $repository = Repository::factory()->create();
+        // En primer lugar vamos a generar los datos que se van a enviar a guardar, es decir simulamos el formulario
+        // de creacion de resgistros
+        $aData = [
+            'url' => $this->faker->url,
+            'description' => $this->faker->text,
+        ];
+
+        // Ahora vamos a instanciar un usuario que sera el encargado de almacenar estos datos, y lo hacemos usando el factory
+        $oUser = User::factory()->create();
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Enviamos los datos por post a guardar en la base de datos, y luego verificamos que se haga
+        // una redireccion hacia la lista de repositorios
+        $this
+            ->actingAs($oUser)
+            //->put("/repositories/$repository->id", $aData) // tambien funciona
+            ->patch("/repositories/$repository->id", $aData)
+            ->assertRedirect("/repositories/$repository->id/edit");
+
+        // Ahora verificamos que estos datos se encuentren registrados en la base de datos en la tabla repositories.
+        $this->assertDatabaseHas('repositories', $aData);
+
+    }
+
+
+    //
+
+    /*
+        Vamos a verificar que se realice una validacion de la informacion que llega antes de ser guardada en la BBDD
+    */
+    public function test_store_repository_validation(){
+
+        // Iniciamos un usuario para hacer el test
+        $oUser = User::factory()->create();
+
+        // Ahora enviamos un arreglo vacio de datos que el sistema no deberia permitir
+        // Por lo tanto esperamos que el sistema haga una redireccion 302 que es una redireccion
+        // a la misma pagina, pero esperamos que se hayan agregado los mensajes de error para los campos
+        // uel y description, eso es lo que validamos en esta prueba
+        $this
+            ->actingAs($oUser)
+            ->post('/repositories', [])
+            ->assertStatus(302)
+            ->assertSessionHasErrors('url', 'description');
+
+    }
+
+
+    /*
+        Vamos a verificar que se realice una validacion de la informacion que llega antes de ser guardada en la BBDD
+    */
+    public function test_update_repository_validation(){
+
+        // Creamos el repositorio que, posteriormente, vamos a actualizar en el test
+        $repository = Repository::factory()->create();
+
+        // Iniciamos un usuario para hacer el test
+        $oUser = User::factory()->create();
+
+        // Ahora enviamos un arreglo vacio de datos que el sistema no deberia permitir
+        // Por lo tanto esperamos que el sistema haga una redireccion 302 que es una redireccion
+        // a la misma pagina, pero esperamos que se hayan agregado los mensajes de error para los campos
+        // uel y description, eso es lo que validamos en esta prueba
+        $this
+            ->actingAs($oUser)
+            //->put("/repositories/$repository->id", []) // tambien funciona
+            ->patch("/repositories/$repository->id", [])
+            ->assertStatus(302)
+            ->assertSessionHasErrors('url', 'description');
 
     }
 }
