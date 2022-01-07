@@ -15,6 +15,9 @@ class CreateRepositoriesTable extends Migration
     {
         Schema::create('repositories', function (Blueprint $table) {
             $table->id();
+            // Agrego los campos necesarios para que se pueda generar el registro en la tabla
+            $table->string('url');
+            $table->text('description');
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
