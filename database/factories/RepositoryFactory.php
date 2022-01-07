@@ -15,7 +15,11 @@ class RepositoryFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => User::factory()->create()
+            // Agregamos en el factory tambien los datos para poder realizar la creacion de registros
+            'url' => $this->faker->url,
+            'description' => $this->faker->text,
+
+            'user_id' => User::factory()->create(),
         ];
     }
 }
