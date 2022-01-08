@@ -52,6 +52,12 @@ class RepositoryController extends Controller
 
     public function destroy(Repository $repository){
 
+        // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
+        // en cuyo caso devolvemos un estado HTTP 403
+        if(Auth::user()->id != $repository->user_id){
+            abort(403);
+        }
+
         // Eliminamos el repositorio de la base de datos
         $repository->delete();
         // Redirigimos al usuario a la pantalla de lista de repositorios
