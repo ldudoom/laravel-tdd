@@ -62,6 +62,27 @@ class RepositoryControllerTest extends TestCase
 
 
     /*
+        Vamos a verificar que se realice una validacion de la informacion que llega antes de ser guardada en la BBDD
+    */
+    public function test_store_repository_validation(){
+
+        // Iniciamos un usuario para hacer el test
+        $oUser = User::factory()->create();
+
+        // Ahora enviamos un arreglo vacio de datos que el sistema no deberia permitir
+        // Por lo tanto esperamos que el sistema haga una redireccion 302 que es una redireccion
+        // a la misma pagina, pero esperamos que se hayan agregado los mensajes de error para los campos
+        // uel y description, eso es lo que validamos en esta prueba
+        $this
+            ->actingAs($oUser)
+            ->post('/repositories', [])
+            ->assertStatus(302)
+            ->assertSessionHasErrors('url', 'description');
+
+    }
+
+
+    /*
         En este test vamos a probar que el guardado de la actualizacionun registro en la base de datos este correcto
         Para eso tendremos que validar que:
             - Se cargue correctamente un formulario populado
@@ -96,28 +117,6 @@ class RepositoryControllerTest extends TestCase
 
     }
 
-
-    /*
-        Vamos a verificar que se realice una validacion de la informacion que llega antes de ser guardada en la BBDD
-    */
-    public function test_store_repository_validation(){
-
-        // Iniciamos un usuario para hacer el test
-        $oUser = User::factory()->create();
-
-        // Ahora enviamos un arreglo vacio de datos que el sistema no deberia permitir
-        // Por lo tanto esperamos que el sistema haga una redireccion 302 que es una redireccion
-        // a la misma pagina, pero esperamos que se hayan agregado los mensajes de error para los campos
-        // uel y description, eso es lo que validamos en esta prueba
-        $this
-            ->actingAs($oUser)
-            ->post('/repositories', [])
-            ->assertStatus(302)
-            ->assertSessionHasErrors('url', 'description');
-
-    }
-
-
     /*
         Vamos a verificar que se realice una validacion de la informacion que llega antes de ser guardada en la BBDD
     */
@@ -143,17 +142,69 @@ class RepositoryControllerTest extends TestCase
     }
 
 
+    /*
+        En este test vamos a probar que el guardado de la actualizacionun registro en la base de datos no pueda hacerse
+        por un usuario que no es el dueño del repositorio
+        Para eso tendremos que validar que:
+            - crear un nuevo usuario e iniciar su sesion
+            - crear un repositorio perteneciente a otro usuario
+            - Enviemos al metodo update
+            - validar que no se pueda realizar la actualizacion recibiendo un estado HTTP 403
+    */
+    public function test_update_repository_policy(){
+
+        /*
+            Debido a que cuando se ejecutan los tests, se limpia la base de datos, cuando creemos un usuario nuevo
+            para validar que el actualice solo sus repositorios, debemos tener en cuenta que:
+
+            Cuando se ejecute el statement:  $oUser = User::factory()->create();
+
+            El usuario tendra el ID -> 1
+
+            Pero cuando se ejecute el statement:  $repository = Repository::factory()->create();
+
+            Esta instruccion crea tambien un usuario junto con el repositorio, por lo que este
+            repositorio tendra un user_id => 2
+
+            Por lo que el usuario que creamos en la primera instruccion no deberia poder editar el repositorio
+            de la segunda instruccion
+
+        */
+         // Ahora vamos a instanciar un usuario que sera el encargado de almacenar estos datos, y lo hacemos usando el factory
+        $oUser = User::factory()->create();
+
+        $repository = Repository::factory()->create();
+        // En primer lugar vamos a generar los datos que se van a enviar a guardar, es decir simulamos el formulario
+        // de creacion de resgistros
+        $aData = [
+            'url' => $this->faker->url,
+            'description' => $this->faker->text,
+        ];
+
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Enviamos los datos por post a guardar en la base de datos, y luego verificamos que se haga
+        // una redireccion hacia la lista de repositorios
+        $this
+            ->actingAs($oUser)
+            //->put("/repositories/$repository->id", $aData) // tambien funciona
+            ->patch("/repositories/$repository->id", $aData)
+            ->assertStatus(403); // Este estado es de proteccion, si recibimos este estado significa que el usuario no pudo hacer la actualizacion
+
+    }
 
     /*
         En este test vamos a validar que se elimine un repositorio del sistema
     */
     public function test_destroy_repository(){
 
-        // En primer lugar vamos a crear un repositorio para eliminarlo posteriormente
-        $repository = Repository::factory()->create();
-
         // Ahora vamos a instanciar un usuario que sera el encargado de eliminar el repositorio, y lo hacemos usando el factory
         $oUser = User::factory()->create();
+
+        // En primer lugar vamos a crear un repositorio para eliminarlo posteriormente
+        $repository = Repository::factory()->create(['user_id' => $oUser->id]);
+
+
 
         // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
         // Enviamos los datos por post a guardar en la base de datos, y luego verificamos que se haga
@@ -178,16 +229,16 @@ class RepositoryControllerTest extends TestCase
     }
 
 
-
     /*
-        En este test vamos a probar que el guardado de la actualizacionun registro en la base de datos este correcto
+        En este test vamos a probar que la eliminacion de un repositorio en la base de datos no pueda hacerse
+        por un usuario que no es el dueño del repositorio
         Para eso tendremos que validar que:
-            - Se cargue correctamente un formulario populado
-            - Si queremos, actualizamos alguna informaicon
-            - Enviemos al metodo update
-            - Y estos cambios persistan en la BBDD
+            - crear un nuevo usuario e iniciar su sesion
+            - crear un repositorio perteneciente a otro usuario
+            - Enviemos al metodo destroy
+            - validar que no se pueda realizar la actualizacion recibiendo un estado HTTP 403
     */
-    public function test_update_repository_policy(){
+    public function test_destroy_repository_policy(){
 
         /*
             Debido a que cuando se ejecutan los tests, se limpia la base de datos, cuando creemos un usuario nuevo
@@ -209,14 +260,6 @@ class RepositoryControllerTest extends TestCase
         $oUser = User::factory()->create();
 
         $repository = Repository::factory()->create();
-        // En primer lugar vamos a generar los datos que se van a enviar a guardar, es decir simulamos el formulario
-        // de creacion de resgistros
-        $aData = [
-            'url' => $this->faker->url,
-            'description' => $this->faker->text,
-        ];
-
-        // Ahora vamos a instanciar un usuario que sera el encargado de almacenar estos datos, y lo hacemos usando el factory
 
 
         // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
@@ -225,7 +268,7 @@ class RepositoryControllerTest extends TestCase
         $this
             ->actingAs($oUser)
             //->put("/repositories/$repository->id", $aData) // tambien funciona
-            ->patch("/repositories/$repository->id", $aData)
+            ->delete("/repositories/$repository->id")
             ->assertStatus(403); // Este estado es de proteccion, si recibimos este estado significa que el usuario no pudo hacer la actualizacion
 
     }
