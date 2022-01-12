@@ -38,7 +38,6 @@ class RepositoryControllerTest extends TestCase
         una lista en blanco
     */
     public function test_index_empty_repositories(){
-
     }
 
     /*
