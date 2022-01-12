@@ -28,6 +28,19 @@ class RepositoryControllerTest extends TestCase
         $this->delete('/repositories/1')->assertRedirect('login');      // Destroy
     }
 
+
+    /*
+        En este metodo vamos a validar que cuando el usuario acceda a la pantalla con la lista de repositorios
+        unicamente vea los repositorios creados por el, y no los de otros usuarios.
+
+        Por lo que para este test vamos a crear varios repositorios de varios usuarios, y vamos a ingresar con otro
+        usuario, por lo que, si van a existir repositorios, pero el usuario con el que vamos a acceder deberia ver
+        una lista en blanco
+    */
+    public function test_index_empty_repositories(){
+
+    }
+
     /*
         En este test vamos a probar que el guardado de un registro en la base de datos este correcto
         Para eso tendremos que validar que:
