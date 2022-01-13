@@ -13,6 +13,7 @@
                         <tr>
                             <th class="border px-4 py-2">ID</th>
                             <th class="border px-4 py-2">ENLACE</th>
+                            <th class="border px-4 py-2">nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -20,10 +21,13 @@
                             <tr>
                                 <td class="border px-4 py-2">{{ $oRepository->id }}</td>
                                 <td class="border px-4 py-2">{{ $oRepository->url }}</td>
+                                <td class="px-4 py-2">
+                                    <a href="{{ route('repositories.show', $oRepository) }}">Ver</a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2">No tienes repositorios creados</td>
+                                <td colspan="3">No tienes repositorios creados</td>
                             </tr>
                         @endforelse
                     </tbody>
