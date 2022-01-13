@@ -20,6 +20,17 @@ class RepositoryController extends Controller
         return view('repositories.index', $aData);
     }
 
+    public function show(Repository $repository){
+
+        // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
+        // en cuyo caso devolvemos un estado HTTP 403
+        if(Auth::user()->id != $repository->user_id){
+            abort(403);
+        }
+        // devolvemos un status 200
+        return view('repositories.show', compact('repository'));
+    }
+
 
     public function store(Request $request){
 
