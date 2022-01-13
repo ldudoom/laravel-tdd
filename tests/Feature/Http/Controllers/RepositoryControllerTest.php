@@ -187,6 +187,48 @@ class RepositoryControllerTest extends TestCase
 
 
     /*
+        Con este test vamos a validar que la vista de edicion de un repositorio se visualice correctamente
+    */
+    public function test_edit_repository(){
+        // Creamos un usuario con el cual vamos a trabajar
+        $oUser = User::factory()->create();
+        // Luego creamos un repositorio que le pertenece al usuario
+        $oRepository = Repository::factory()->create(['user_id' => $oUser->id]);
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Consultamos el formulario de edicion del repositorio, y debemos obtener un status 200
+        // tambien vamos a verificar que exista la informacion del repositorio, ya que debemos
+        // asegurarnos de que el formulario se haya populado para su edicion
+        $this
+            ->actingAs($oUser)
+            ->get("/repositories/$oRepository->id/edit")
+            ->assertStatus(200)
+            ->assertSee($oRepository->url)
+            ->assertSee($oRepository->description);
+    }
+
+
+    /*
+
+    */
+    public function test_edit_repository_policy(){
+
+         // Ahora vamos a instanciar un usuario que sera el encargado de editar estos datos, y lo hacemos usando el factory
+        $oUser = User::factory()->create();
+        // Creamos un repositorio que no le pertenece a este usuario
+        $oRepository = Repository::factory()->create();
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Enviamos los datos por post a guardar en la base de datos, y luego verificamos que se devuelva un status 403
+        $this
+            ->actingAs($oUser)
+            ->get("/repositories/$oRepository->id/edit")
+            ->assertStatus(403); // Este estado es de proteccion, si recibimos este estado significa que el usuario no pudo hacer la actualizacion
+
+    }
+
+
+    /*
         En este test vamos a probar que el guardado de la actualizacionun registro en la base de datos este correcto
         Para eso tendremos que validar que:
             - Se cargue correctamente un formulario populado
