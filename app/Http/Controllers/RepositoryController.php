@@ -48,6 +48,18 @@ class RepositoryController extends Controller
     }
 
 
+
+    public function edit(Repository $repository){
+
+        // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
+        // en cuyo caso devolvemos un estado HTTP 403
+        if(Auth::user()->id != $repository->user_id){
+            abort(403);
+        }
+        // devolvemos un status 200
+        return view('repositories.edit', compact('repository'));
+    }
+
     public function update(Request $request, Repository $repository){
 
         $request->validate([
