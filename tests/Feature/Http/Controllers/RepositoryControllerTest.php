@@ -85,6 +85,53 @@ class RepositoryControllerTest extends TestCase
             ->assertSee($oRepository->url);
     }
 
+
+    /*
+        En este test vamos a probar que un usuario unicamente pueda ver un repositorio si este le pertenece
+    */
+    public function test_show_repository(){
+        // Creamos un usuario con el cual vamos a trabajar
+        $oUser = User::factory()->create();
+        // Luego creamos un repositorio que le pertenece al usuario
+        $oRepository = Repository::factory()->create(['user_id' => $oUser->id]);
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Consultamos el detalle del repositorio, y debemos obtener un status 200
+        // Unicamente probamos el estado HTTP ya que si se consulta un repositorio que no existe
+        // o un repositorio que no le pertenece al usuario vamos a obtener un codigo diferente
+        $this
+            ->actingAs($oUser)
+            ->get("/repositories/$oRepository->id")
+            ->assertStatus(200);
+    }
+
+
+    /*
+        En este test vamos a probar que visualizar un repositorio no pueda hacerse por un usuario que no es el dueño del repositorio
+        Para eso tendremos que validar que:
+            - crear un nuevo usuario e iniciar su sesion
+            - crear un repositorio perteneciente a otro usuario
+            - Enviemos al metodo show
+            - validar que no se pueda visualizar recibiendo un estado HTTP 403
+    */
+    public function test_show_repository_policy(){
+
+
+         // Ahora vamos a instanciar un usuario que sera el encargado de visualizar estos datos, y lo hacemos usando el factory
+        $oUser = User::factory()->create();
+        // Creamos un repositorio que no le pertenece a este usuario
+        $oRepository = Repository::factory()->create();
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Enviamos los datos por post a guardar en la base de datos, y luego verificamos que se haga
+        // una redireccion hacia la lista de repositorios
+        $this
+            ->actingAs($oUser)
+            ->get("/repositories/$oRepository->id")
+            ->assertStatus(403); // Este estado es de proteccion, si recibimos este estado significa que el usuario no pudo hacer la actualizacion
+
+    }
+
     /*
         En este test vamos a probar que el guardado de un registro en la base de datos este correcto
         Para eso tendremos que validar que:
