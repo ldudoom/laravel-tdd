@@ -38,6 +38,51 @@ class RepositoryControllerTest extends TestCase
         una lista en blanco
     */
     public function test_index_empty_repositories(){
+        // En primer lugar generamos 10 repositorios que le van a pertenecer a cierto usuario
+        $oUser1 = User::factory()->create();
+        Repository::factory()->count(10)->create(['user_id' => $oUser1->id]);
+
+        // Ahora generamos el usuario con el cual vamos a navegar en la lista de repositorios
+        $oUser2 = User::factory()->create();
+
+        // Ahora iniciamos la sesion del usuario con el que vamos a navegar
+        // Accedemos a la ruta que hace referencia a la lista de repositorios
+        // Esperamos en primer lugar un status 200 como respuesta
+        // Y por ultimo, vamos a esperar recibir un texto indicando que el usuario no tiene repositorios
+        $this
+            ->actingAs($oUser2)
+            ->get('repositories')
+            ->assertStatus(200)
+            ->assertSee('No tienes repositorios creados');
+    }
+
+
+    /*
+        En este metodo vamos a validar que cuando el usuario acceda a la pantalla con la lista de repositorios
+        unicamente vea los repositorios creados por el, y no los de otros usuarios.
+
+        En este test vamos a crear varios repositorios de varios usuarios, y vamos a ingresar con otro
+        usuario para el cual tambien vamos a crear repositorios, por lo que, si van a existir repositorios,
+        entonces, el usuario con el que vamos a acceder deberia ver una lista unicamente de sus repositorios
+    */
+    public function test_index_with_repositories(){
+        // En primer lugar generamos 10 repositorios que le van a pertenecer a cierto usuario
+        Repository::factory()->count(10)->create();
+
+        // Ahora generamos el usuario con el cual vamos a navegar en la lista de repositorios
+        $oUser = User::factory()->create();
+        $oRepository = Repository::factory()->create(['user_id' => $oUser->id]);
+
+        // Ahora iniciamos la sesion del usuario con el que vamos a navegar
+        // Accedemos a la ruta que hace referencia a la lista de repositorios
+        // Esperamos en primer lugar un status 200 como respuesta
+        // Y por ultimo, vamos a esperar poder ver el repositorio creado por el usuario
+        $this
+            ->actingAs($oUser)
+            ->get('repositories')
+            ->assertStatus(200)
+            ->assertSee($oRepository->id)
+            ->assertSee($oRepository->url);
     }
 
     /*
