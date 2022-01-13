@@ -14,6 +14,7 @@
                             <th class="border px-4 py-2">ID</th>
                             <th class="border px-4 py-2">ENLACE</th>
                             <th class="border px-4 py-2">nbsp;</th>
+                            <th class="border px-4 py-2">nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,10 +25,13 @@
                                 <td class="px-4 py-2">
                                     <a href="{{ route('repositories.show', $oRepository) }}">Ver</a>
                                 </td>
+                                <td class="px-4 py-2">
+                                    <a href="{{ route('repositories.edit', $oRepository) }}">Editar</a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3">No tienes repositorios creados</td>
+                                <td colspan="4">No tienes repositorios creados</td>
                             </tr>
                         @endforelse
                     </tbody>
