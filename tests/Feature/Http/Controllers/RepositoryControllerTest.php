@@ -132,6 +132,23 @@ class RepositoryControllerTest extends TestCase
 
     }
 
+
+
+    /*
+        Con este test vamos a validar que la vista de creacion de un repositorio se visualice correctamente
+    */
+    public function test_create_repository(){
+        // Creamos un usuario con el cual vamos a trabajar
+        $oUser = User::factory()->create();
+
+        // Ahora vamos a iniciar la sesion del usuario, ya que nuestras rutas estan protegidas
+        // Consultamos el formulario de creacion del repositorio, y debemos obtener un status 200
+        $this
+            ->actingAs($oUser)
+            ->get("/repositories/create")
+            ->assertStatus(200);
+    }
+
     /*
         En este test vamos a probar que el guardado de un registro en la base de datos este correcto
         Para eso tendremos que validar que:
