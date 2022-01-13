@@ -16,7 +16,7 @@
                     <label for="url" class="block font-medium text-sm text-gray-700">URL *</label>
                     <input type="text" name="url" id="url" class="form-input w-full rounded-md shadow-sm" value="{{ $repository->url }}" />
 
-                    <label for="description" class="block font-medium text-sm text-gray-700">URL *</label>
+                    <label for="description" class="block font-medium text-sm text-gray-700">Descripcion *</label>
                     <textarea name="description" id="description" class="form-input w-full rounded-md shadow-sm" />{{ $repository->description }}</textarea>
 
                     <hr class="my-4">
