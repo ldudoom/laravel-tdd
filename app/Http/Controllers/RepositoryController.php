@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Auth;
 class RepositoryController extends Controller
 {
 
+    public function index(Request $request){
+
+        $aData = [
+            'aRepositories' => $request->user()->repositories,
+        ];
+        return view('repositories.index', $aData);
+    }
+
 
     public function store(Request $request){
 
