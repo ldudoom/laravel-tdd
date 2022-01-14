@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\RepositoryRequest;
 
-use App\Models\User;
 use App\Models\Repository;
 
 use Illuminate\Support\Facades\Auth;
@@ -35,12 +35,7 @@ class RepositoryController extends Controller
         return view('repositories.create');
     }
 
-    public function store(Request $request){
-
-        $request->validate([
-            'url' => 'required|url',
-            'description' => 'required'
-        ]);
+    public function store(RepositoryRequest $request){
 
         // Debido a que ya tenemos un usuario logueado, podemos utilizarlo para crear un repositorio
         // que le pertenezca
@@ -49,8 +44,6 @@ class RepositoryController extends Controller
         // Ahora, una vez que el repositorio esta creado, procedemos a realizar la redireccion
         return redirect()->route('repositories.index');
     }
-
-
 
     public function edit(Repository $repository){
 
@@ -63,12 +56,7 @@ class RepositoryController extends Controller
         return view('repositories.edit', compact('repository'));
     }
 
-    public function update(Request $request, Repository $repository){
-
-        $request->validate([
-            'url' => 'required|url',
-            'description' => 'required'
-        ]);
+    public function update(RepositoryRequest $request, Repository $repository){
 
         // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
         // en cuyo caso devolvemos un estado HTTP 403
