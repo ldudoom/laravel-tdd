@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Auth;
 class RepositoryController extends Controller
 {
 
-    public function index(Request $request){
+    public function index(){
 
         $aData = [
-            'aRepositories' => $request->user()->repositories,
+            'aRepositories' => Auth::user()->repositories,
         ];
         return view('repositories.index', $aData);
     }
@@ -24,9 +24,10 @@ class RepositoryController extends Controller
 
         // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
         // en cuyo caso devolvemos un estado HTTP 403
-        if(Auth::user()->id != $repository->user_id){
+        /*if(Auth::user()->id != $repository->user_id){
             abort(403);
-        }
+        }*/
+        $this->authorize('pass', $repository);
         // devolvemos un status 200
         return view('repositories.show', compact('repository'));
     }
@@ -49,9 +50,10 @@ class RepositoryController extends Controller
 
         // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
         // en cuyo caso devolvemos un estado HTTP 403
-        if(Auth::user()->id != $repository->user_id){
+        /*if(Auth::user()->id != $repository->user_id){
             abort(403);
-        }
+        }*/
+        $this->authorize('pass', $repository);
         // devolvemos un status 200
         return view('repositories.edit', compact('repository'));
     }
@@ -60,9 +62,10 @@ class RepositoryController extends Controller
 
         // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
         // en cuyo caso devolvemos un estado HTTP 403
-        if(Auth::user()->id != $repository->user_id){
+        /*if(Auth::user()->id != $repository->user_id){
             abort(403);
-        }
+        }*/
+        $this->authorize('pass', $repository);
 
         // Debido a que ya tenemos un usuario logueado, podemos utilizarlo para crear un repositorio
         // que le pertenezca
@@ -76,9 +79,10 @@ class RepositoryController extends Controller
 
         // Verificamos si el usuario logueado esta intentando actualizar un repositorio que no le pertenece
         // en cuyo caso devolvemos un estado HTTP 403
-        if(Auth::user()->id != $repository->user_id){
+        /*if(Auth::user()->id != $repository->user_id){
             abort(403);
-        }
+        }*/
+        $this->authorize('pass', $repository);
 
         // Eliminamos el repositorio de la base de datos
         $repository->delete();
