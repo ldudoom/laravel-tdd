@@ -21,7 +21,7 @@
 
                     <hr class="my-4">
 
-                    <input type="submit" value="Actualizar" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-md">
+                    <input type="submit" value="Actualizar" class="">
                 </form>
             </div>
         </div>

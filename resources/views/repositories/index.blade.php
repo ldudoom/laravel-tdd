@@ -13,8 +13,8 @@
                         <tr>
                             <th class="border px-4 py-2">ID</th>
                             <th class="border px-4 py-2">ENLACE</th>
-                            <th class="border px-4 py-2">nbsp;</th>
-                            <th class="border px-4 py-2">nbsp;</th>
+                            <th class="border px-4 py-2">&nbsp;</th>
+                            <th class="border px-4 py-2">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>

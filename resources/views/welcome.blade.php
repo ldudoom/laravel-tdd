@@ -23,7 +23,7 @@
                             <h2 class="text-sm font-semibold text-black">{{ $oRepository->url }}</h2>
                             <p>{{ $oRepository->description }}</p>
                         </div>
-                        <span class="text-xs font-medium text-gray-600">{{ $oRepository->created_at }}</span>
+                        <span class="text-xs font-medium text-gray-600">{{ $oRepository->created_at->diffForHumans() }}</span>
                     </div>
                 </li>
             @endforeach
